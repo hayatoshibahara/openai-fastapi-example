@@ -99,11 +99,10 @@ async def image_captioning(request: Request, image: UploadFile = File(...)):
     image_data_url = (
         f"data:image/{image.content_type.split('/')[-1]};base64,{image_base64}"
     )
-    print(image_data_url)
 
     response = client.chat.completions.create(
         model="gpt-4o-mini",
-        temperature=0.2,
+        temperature=0,
         messages=[
             {
                 "role": "system",
@@ -124,10 +123,11 @@ async def image_captioning(request: Request, image: UploadFile = File(...)):
             },
             {
                 "role": "user",
-                "content": "この画像には何が写っていますか？",
+                "content": "標識やラベルに書かれたテキストをJSONで出力してください。",
             },
         ],
         max_tokens=300,
+        response_format={"type": "json_object"},
     )
 
     image_caption = response.choices[0].message.content
