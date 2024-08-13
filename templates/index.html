@@ -11,8 +11,8 @@
     <link rel="stylesheet" href="{{ url_for('static', path='main.css') }}" />
   </head>
   <body>
-    <h1>OpenAI FastAPI Example</h1>
-    <h2>エンジニアカフェBot</h2>
+    <h1><a href="/">OpenAI FastAPI Example</a></h1>
+    <h2>Chat Completions API Example</h2>
     <p><code>context.txt</code>の情報を元に一問一答の回答を生成します。</p>
     <form action="/completions" method="post">
       <input
@@ -26,6 +26,23 @@
     </form>
     {% if message %}
     <p class="message">{{ message }}</p>
+    {% endif %}
+    <h2>Images API Example</h2>
+    <p>細部まで緻密に描かれた高品質なアイコン画像を生成します。</p>
+    <form action="/images" method="post">
+      <input
+        type="text"
+        name="prompt"
+        placeholder="画像のお題を入力してください。"
+        autocomplete="off"
+        required
+      />
+      <input type="submit" value="送信" />
+    </form>
+    {% if image_prompt %}
+    <p class="message">「{{ image_prompt }}」に関する画像を生成しました。</p>
+    {% endif %} {% if image_url %}
+    <img src="{{ image_url }}" alt="Generated Image" />
     {% endif %}
   </body>
 </html>
