@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>OpenAI FastAPI Example</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{{ url_for('static', path='main.css') }}" />
+  </head>
+  <body>
+    <h1>OpenAI FastAPI Example</h1>
+    <h2>エンジニアカフェBot</h2>
+    <p><code>context.txt</code>の情報を元に一問一答の回答を生成します。</p>
+    <form action="/completions" method="post">
+      <input
+        type="text"
+        name="prompt"
+        placeholder="エンジニアカフェに関する質問を入力してください"
+        autocomplete="off"
+        required
+      />
+      <input type="submit" value="送信" />
+    </form>
+    {% if message %}
+    <p class="message">{{ message }}</p>
+    {% endif %}
+  </body>
+</html>

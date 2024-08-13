@@ -1,0 +1,11 @@
+* {
+  font-family: "Noto Sans JP", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+  max-width: 512px;
+}
+
