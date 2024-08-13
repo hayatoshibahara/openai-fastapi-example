@@ -1,4 +1,5 @@
 import base64
+import os
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request, Form, File, UploadFile
@@ -131,7 +132,6 @@ async def image_captioning(request: Request, image: UploadFile = File(...)):
     )
 
     image_caption = response.choices[0].message.content
-    print(image_caption)
 
     return templates.TemplateResponse(
         "index.html",
@@ -139,6 +139,46 @@ async def image_captioning(request: Request, image: UploadFile = File(...)):
     )
 
 
+@app.post("/transcribe", response_class=HTMLResponse)
+async def transcribe(request: Request, audio: UploadFile = File(...)):
+    wav = await audio.read()
+    if not audio.filename.endswith(".wav"):
+        return "WAV形式でアップロードしてください"
+
+    wav_path = os.path.join("upload", audio.filename)
+    with open(wav_path, "wb") as file:
+        file.write(wav)
+
+    wav_loaded = open(wav_path, "rb")
+    transcription = client.audio.transcriptions.create(
+        model="whisper-1",
+        file=wav_loaded,
+    )
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "system",
+                "content": "あなたは会議の内容を正確に翻訳するAIです。",
+            },
+            {"role": "user", "content": f"議事録を日本語に翻訳: {transcription.text}"},
+        ],
+    )
+
+    translation = response.choices[0].message.content
+
+    return templates.TemplateResponse(
+        "index.html",
+        {
+            "request": request,
+            "transcription": transcription.text,
+            "translation": translation,
+        },
+    )
+
+
 if __name__ == "__main__":
     load_dotenv(override=True)
+    os.makedirs("upload", exist_ok=True)
     uvicorn.run("main:app", host="localhost", port=8000, reload=True)

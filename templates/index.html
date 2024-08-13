@@ -57,5 +57,16 @@
     {% if image_caption %}
     <p class="message">{{ image_caption }}</p>
     {% endif %}
+    <h2>音声翻訳</h2>
+    <p>英語の音声を日本語の文章に翻訳します。</p>
+    <form action="transcribe" method="post" enctype="multipart/form-data">
+      <input type="file" name="audio" accept="audio/wav" required />
+      <input type="submit" value="送信" />
+    </form>
+    {% if transcription %}
+    <p class="message">{{ transcription }}</p>
+    {% endif %} {% if translation %}
+    <p class="message">{{ translation }}</p>
+    {% endif %}
   </body>
 </html>
