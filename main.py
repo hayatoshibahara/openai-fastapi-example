@@ -1,5 +1,7 @@
+import base64
+
 from dotenv import load_dotenv
-from fastapi import FastAPI, Request, Form
+from fastapi import FastAPI, Request, Form, File, UploadFile
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -83,6 +85,57 @@ async def dalle(request: Request, prompt: str = Form(...)):
     return templates.TemplateResponse(
         "index.html",
         {"request": request, "image_prompt": image_prompt, "image_url": image_url},
+    )
+
+
+@app.post("/image-captioning", response_class=HTMLResponse)
+async def image_captioning(request: Request, image: UploadFile = File(...)):
+    """
+    GPT4o-mini を使用し、画像の説明を生成します。
+    https://cookbook.openai.com/examples/tag_caption_images_with_gpt4v
+    """
+    image_content = await image.read()
+    image_base64 = base64.b64encode(image_content).decode("utf-8")
+    image_data_url = (
+        f"data:image/{image.content_type.split('/')[-1]};base64,{image_base64}"
+    )
+    print(image_data_url)
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        temperature=0.2,
+        messages=[
+            {
+                "role": "system",
+                "content": """
+                あなたは画像の中から標識やラベルなどのテキストを読み取り、正確に回答するAIです。
+                """,
+            },
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": image_data_url,
+                        },
+                    }
+                ],
+            },
+            {
+                "role": "user",
+                "content": "この画像には何が写っていますか？",
+            },
+        ],
+        max_tokens=300,
+    )
+
+    image_caption = response.choices[0].message.content
+    print(image_caption)
+
+    return templates.TemplateResponse(
+        "index.html",
+        {"request": request, "image_caption": image_caption},
     )
 
 

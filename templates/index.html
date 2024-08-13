@@ -44,5 +44,18 @@
     {% endif %} {% if image_url %}
     <img src="{{ image_url }}" alt="Generated Image" />
     {% endif %}
+    <h2>Image Captioning</h2>
+    <p>画像に写っている標識やラベルを回答します。</p>
+    <form
+      action="/image-captioning"
+      method="post"
+      enctype="multipart/form-data"
+    >
+      <input type="file" name="image" accept="image/*" required />
+      <input type="submit" value="送信" />
+    </form>
+    {% if image_caption %}
+    <p class="message">{{ image_caption }}</p>
+    {% endif %}
   </body>
 </html>
